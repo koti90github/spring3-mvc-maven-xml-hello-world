@@ -31,6 +31,34 @@
                 }
             }
 
+stage('Artifactory') {
+            steps {
+                  script{
+                    rtServer(
+                        id: "ARTIFACTORY_SERVER",
+                        url: 'http://3.129.249.132:8082/',
+                        credentialsId: 'ARTIFACTORY_SERVER',
+                        bypassProxy: true,
+                    )
+                    rtUpload(
+                        serverId: 'ARTIFACTORY_SERVER',
+                        spec:
+                        '''{
+                        "files": [{
+                            "pattern": "./target/*.war",
+                            "target": "test-repo-libs-release/1.0.${BUILD_NUMBER}/",
+                            "recursive": "false"
+                        }]
+                    }''',
+                    failNoOp: true
+                )
+                rtPublishBuildInfo(
+                    serverId: 'ARTIFACTORY_SERVER',
+                    buildName: test-repo-libs-release',
+                    buildNumber: "${branch}",
+                )
+
+        }
 
 
         }
